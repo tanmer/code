@@ -11,7 +11,7 @@ import './index.css';
 
 export default class CodeTool {
   /**
-   * Empty Quote is not empty Block
+   * Empty textarea is not empty Block
    * @public
    * @returns {boolean}
    */
