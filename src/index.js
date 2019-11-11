@@ -94,9 +94,8 @@ export default class CodeTool {
   render() {
     this.nodes.wrapper = this.make('div', [this.CSS.baseClass, this.CSS.wrapper])
     this.nodes.textarea = this.make('textarea', [this.CSS.textarea, this.CSS.input], {
-      innerHTML: this.data.text
+      placeholder: this.placeholder
     })
-
     this.nodes.wrapper.appendChild(this.nodes.textarea);
     if (this.data.code) {
       this.nodes.textarea.textContent = this.data.code
