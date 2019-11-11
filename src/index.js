@@ -1,7 +1,4 @@
-/**
- * Build styles
- */
-require('./index.css').toString();
+import './index.css';
 
 /**
  * CodeTool for Editor.js
@@ -12,7 +9,16 @@ require('./index.css').toString();
  * @version 2.0.0
  */
 
-class CodeTool {
+export default class CodeTool {
+  /**
+   * Empty textarea is not empty Block
+   * @public
+   * @returns {boolean}
+   */
+  static get contentless() {
+    return true;
+  }
+
   /**
    * Allow to press Enter inside the CodeTool textarea
    * @returns {boolean}
@@ -47,6 +53,7 @@ class CodeTool {
     };
 
     this.nodes = {
+      wrapper: null,
       holder: null,
       textarea: null
     };
@@ -54,30 +61,29 @@ class CodeTool {
     this.data = {
       code: data.code || ''
     };
-
-    this.nodes.holder = this.drawView();
   }
 
   /**
-   * Create Tool's view
+   * Helper method for elements creation
+   * @param tagName
+   * @param classNames
+   * @param attributes
    * @return {HTMLElement}
-   * @private
    */
-  drawView() {
-    let wrapper = document.createElement('div'),
-      textarea = document.createElement('textarea');
+  make(tagName, classNames = null, attributes = {}) {
+    let el = document.createElement(tagName);
 
-    wrapper.classList.add(this.CSS.baseClass, this.CSS.wrapper);
-    textarea.classList.add(this.CSS.textarea, this.CSS.input);
-    textarea.textContent = this.data.code;
+    if (Array.isArray(classNames)) {
+      el.classList.add(...classNames);
+    } else if (classNames) {
+      el.classList.add(classNames);
+    }
 
-    textarea.placeholder = this.placeholder;
+    for (let attrName in attributes) {
+      el[attrName] = attributes[attrName];
+    }
 
-    wrapper.appendChild(textarea);
-
-    this.nodes.textarea = textarea;
-
-    return wrapper;
+    return el;
   }
 
   /**
@@ -86,7 +92,25 @@ class CodeTool {
    * @public
    */
   render() {
-    return this.nodes.holder;
+    this.nodes.wrapper = this.make('div', [this.CSS.baseClass, this.CSS.wrapper])
+    this.nodes.textarea = this.make('textarea', [this.CSS.textarea, this.CSS.input], {
+      innerHTML: this.data.text
+    })
+
+    this.nodes.wrapper.appendChild(this.nodes.textarea);
+    if (this.data.code) {
+      this.nodes.textarea.textContent = this.data.code
+      this.nodes.textarea.value = this.data.code
+
+      // 存在数据的下一次加载，直接在textarea中修改值不会触发editorjs的change事件
+      this.nodes.textarea.addEventListener('keyup', () => {
+        this.nodes.textarea.textContent = this.nodes.textarea.value
+        this.nodes.textarea.value = this.nodes.textarea.value
+        this.nodes.textarea.removeEventListener('keyup', () => {})
+      })
+    }
+
+    return this.nodes.wrapper;
   }
 
   /**
@@ -169,5 +193,3 @@ class CodeTool {
     };
   }
 }
-
-module.exports = CodeTool;
